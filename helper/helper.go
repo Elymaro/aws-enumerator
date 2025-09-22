@@ -35,15 +35,15 @@ func SetEnumerationPipeline(services, speed *string) {
 	}
 }
 
-func DumpInfo(services_dump *string, print_apicalls *bool, filter *string, errors_dump *bool) {
+func DumpInfo(services_dump *string, print_apicalls *bool, filter *string, errors_dump *bool, clear_empty *bool) {
 	if *services_dump == "all" {
 		for _, service := range utils.ServiceNames() {
-			utils.AnalyseService(service, *print_apicalls, *filter, *errors_dump)
+			utils.AnalyseService(service, *print_apicalls, *filter, *errors_dump, *clear_empty)
 		}
 		fmt.Println()
 	} else {
 		for _, service := range utils.ProcessServiceArgument(*services_dump) {
-			utils.AnalyseService(service, *print_apicalls, *filter, *errors_dump)
+			utils.AnalyseService(service, *print_apicalls, *filter, *errors_dump, *clear_empty)
 		}
 		fmt.Println()
 	}
@@ -94,6 +94,7 @@ Flags:
   -filter       Retrieve only wanted API Call Names by filtering the name. Additional flag. (Filters by first specified chars)
   -print        Print data for a specified service API Calls Get the list of accessible apicalls. Additional flag.
   -errors       Analyse errors returned by AWS API for a specific service. Additional flag.
+  -clear-empty  Hide services with empty results ({}). Suppresses "No entries in provided service" output.
 
 Example:
   #1 
@@ -107,6 +108,7 @@ Example:
   ./aws-enumerator dump -services all -filter Get
   ./aws-enumerator dump -services all -filter Get -print
   ./aws-enumerator dump -services all -filter Get -print -errors
+  ./aws-enumerator dump -services all -filter Get -print -clear-empty
 `
 
 // Command line flags:
@@ -126,3 +128,4 @@ var Services_dump *string = Dump.String("services", "all", "")
 var Errors_dump *bool = Dump.Bool("errors", false, "")
 var Print *bool = Dump.Bool("print", false, "")
 var Filter *string = Dump.String("filter", "", "")
+var Clear_empty *bool = Dump.Bool("clear-empty", false, "")
