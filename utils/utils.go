@@ -122,12 +122,14 @@ func CheckEnvFileExistance() bool {
 	return true
 }
 
-func CheckFileExistance(path string) bool {
+func CheckFileExistance(path string, clear_empty bool) bool {
 	if _, err := os.Stat(path); err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println(Red("Error:"), Yellow("File"), Yellow(path), Yellow("does not exist"))
-			fmt.Println(Green("Fix:"), Yellow("DB does not exist, skip this service"))
-			//fmt.Println(Red("Trace:"), Yellow(err))
+			if !clear_empty {
+				fmt.Println(Red("Error:"), Yellow("File"), Yellow(path), Yellow("does not exist"))
+				fmt.Println(Green("Fix:"), Yellow("DB does not exist, skip this service"))
+				//fmt.Println(Red("Trace:"), Yellow(err))
+			}
 			return false
 		}
 	}
@@ -192,7 +194,7 @@ func GetJsonFromFile(filepath string) (result map[string]interface{}) {
 	return result
 }
 
-func AnalyseService(service string, print bool, filter string, errors_dump bool) {
+func AnalyseService(service string, print bool, filter string, errors_dump bool, clear_empty bool) {
 
 	// Error or result analyse
 	var filepath string
@@ -201,17 +203,22 @@ func AnalyseService(service string, print bool, filter string, errors_dump bool)
 	} else {
 		filepath = ERROR_FILEPATH + service + "_errors.json"
 	}
-
-	// Display
-	PrintDividedLine(strings.ToUpper(service))
-	fmt.Println("")
-
+	
 	// Check the file existance
-	if CheckFileExistance(filepath) {
-
+	if CheckFileExistance(filepath, clear_empty) {
+			
 		// dump service db_file
 		result := GetJsonFromFile(filepath)
 
+		// // Skip display if empty and clear-empty flag is enabled
+		if len(result) == 0 && clear_empty {
+		    return
+		}
+		
+		// Display service
+		PrintDividedLine(strings.ToUpper(service))
+		fmt.Println("")
+		
 		// check whether any info was stored
 		if len(result) == 0 {
 			fmt.Println(Red("Error:"), Yellow("No entries in provided service"))
