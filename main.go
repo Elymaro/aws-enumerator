@@ -38,7 +38,7 @@ func main() {
 
 	case "dump":
 		helper.Dump.Parse(os.Args[2:])
-		helper.DumpInfo(helper.Services_dump, helper.Print, helper.Filter, helper.Errors_dump)
+		helper.DumpInfo(helper.Services_dump, helper.Print, helper.Filter, helper.Errors_dump, helper.Clear_empty)
 
 	default:
 		fmt.Println(helper.Cloudrider_help)
